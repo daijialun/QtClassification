@@ -43,11 +43,7 @@ void MainWindow::ShowDialog()  {
 }
 
 void MainWindow::Prediction()  {
-        QString path = ui->lineImagePath->text();
-        std::string imgPath = path.toStdString();
-        mImage = cv::imread(imgPath, 0);
         if( mImage.empty() )  { qDebug() << "Error image input"; }
-
         // ******** Image Preprocess ******** //
         cv::Mat mResized;
         if( mImage.size() != cv::Size(height_, width_) )
@@ -80,12 +76,18 @@ void MainWindow::Prediction()  {
         CHECK_EQ( blobImage->width(), 227) << "Network must input size: 227x227";
 
         float* blobData = blobImage->mutable_cpu_data();
-        uchar* mData = mNormalized.data;
+        mNormalized.convertTo(mNormalized, CV_8UC1);
+        for(int i=0; i<height_*width_; i++)  {
+                *blobData = static_cast<float>(*mNormalized.data);
+                blobData++;
+                mNormalized.data++;
+        }
+        /*uchar* mData = mNormalized.data;
         for(int i=0; i<height_*width_; i++)  {
                 *blobData = static_cast<float>(*mData);
                 blobData++;
                 mData++;
-        }
+        }*/
 
         // *********** Forward ************* //
         net_->Forward();
@@ -113,20 +115,20 @@ void MainWindow::Prediction()  {
 
         std::partial_sort(vec_pairs.begin(), vec_pairs.begin()+5, vec_pairs.end(), PairCompare);
 
-        std::vector<int> vec_seq;           // seq => shunxu
-        for(int i=0; i<5; i++)  {
-                vec_seq.push_back(vec_pairs[i].first);
-        }
+        //std::vector<int> vec_seq;           // seq => shunxu list
+        //for(int i=0; i<5; i++)  {
+       //         vec_seq.push_back(vec_pairs[i].first);
+        //}
         for(int i=0; i<5; i++)  {
                 qDebug() << QString::number(i) << " "
-                                << QString::fromStdString(labels_[vec_seq[i]])
+                                << QString::fromStdString(labels_[vec_pairs[i].first])
                                 << QString::number(vec_pairs[i].second);
         }
-        ui->labelClass1->setText(QString::fromStdString(labels_[vec_seq[0]]));
-        ui->labelClass2->setText(QString::fromStdString(labels_[vec_seq[1]]));
-        ui->labelClass3->setText(QString::fromStdString(labels_[vec_seq[2]]));
-        ui->labelClass4->setText(QString::fromStdString(labels_[vec_seq[3]]));
-        ui->labelClass5->setText(QString::fromStdString(labels_[vec_seq[4]]));
+        ui->labelClass1->setText(QString::fromStdString(labels_[vec_pairs[0].first]));
+        ui->labelClass2->setText(QString::fromStdString(labels_[vec_pairs[1].first]));
+        ui->labelClass3->setText(QString::fromStdString(labels_[vec_pairs[2].first]));
+        ui->labelClass4->setText(QString::fromStdString(labels_[vec_pairs[3].first]));
+        ui->labelClass5->setText(QString::fromStdString(labels_[vec_pairs[4].first]));
 
         ui->labelScore1->setText(QString::number(vec_pairs[0].second));
         ui->labelScore2->setText(QString::number(vec_pairs[1].second));
@@ -176,6 +178,7 @@ void MainWindow::SelectModel()  {
         std::ifstream label_file("label.txt");
         CHECK(label_file) << "Unable to open labels file " << label_file;
         std::string line;
+        labels_.clear();
         while( std::getline(label_file, line) )  {
                     labels_.push_back(line);
         }
