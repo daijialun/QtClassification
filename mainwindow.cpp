@@ -30,9 +30,9 @@ void MainWindow::ShowDialog()  {
 
     QPixmap pix;
     pix.load(fileName);
-    if(pix.height()>300 || pix.width()>450)  {
+    if( pix.height()>ui->labelImage->height() || pix.width()>ui->labelImage->width() )  {
             QPixmap imgScaled;
-            imgScaled = pix.scaled(450, 300, Qt::KeepAspectRatio);
+            imgScaled = pix.scaled(ui->labelImage->height(), ui->labelImage->width(), Qt::KeepAspectRatio);
             ui->labelImage->setPixmap(imgScaled);
     }
     else
@@ -127,6 +127,10 @@ void MainWindow::Prediction()  {
         //for(int i=0; i<5; i++)  {
        //         vec_seq.push_back(vec_pairs[i].first);
         //}
+        std::vector<std::string> labels_sorted;
+        for(int i=0; i<labels_.size(); i++)  {
+                labels_sorted.push_back( labels_[vec_pairs[i].first] );
+        }
         for(int i=0; i<5; i++)  {
                 qDebug() << QString::number(i) << " "
                                 << QString::fromStdString(labels_[vec_pairs[i].first])
@@ -136,19 +140,47 @@ void MainWindow::Prediction()  {
         ui->labelClass2->setText(QString::fromStdString(labels_[vec_pairs[1].first]));
         ui->labelClass3->setText(QString::fromStdString(labels_[vec_pairs[2].first]));
         ui->labelClass4->setText(QString::fromStdString(labels_[vec_pairs[3].first]));
-        ui->labelClass5->setText(QString::fromStdString(labels_[vec_pairs[4].first]));
 
         ui->labelScore1->setText(QString::number(vec_pairs[0].second));
         ui->labelScore2->setText(QString::number(vec_pairs[1].second));
         ui->labelScore3->setText(QString::number(vec_pairs[2].second));
         ui->labelScore4->setText(QString::number(vec_pairs[3].second));
-        ui->labelScore5->setText(QString::number(vec_pairs[4].second));
 
+        ShowTopImage(labels_sorted);
 
 }
 
 bool MainWindow::PairCompare(const std::pair<int, float>& lhs, const std::pair<int, float>& rhs) {
     return lhs.second > rhs.second;
+}
+
+void MainWindow::ShowTopImage(std::vector<std::string> labels)
+{
+        QString label1 = ":/images/" + QString::fromStdString(labels[0]) + ".png";
+        QString label2 = ":/images/" + QString::fromStdString(labels[1]) + ".png";
+        QString label3 = ":/images/" + QString::fromStdString(labels[2]) + ".png";
+        QString label4 = ":/images/" + QString::fromStdString(labels[3]) + ".png";
+
+        QPixmap qpixTop1, qpixTop2, qpixTop3, qpixTop4;
+        qpixTop1.load(label1);
+        qpixTop2.load(label2);
+        qpixTop3.load(label3);
+        qpixTop4.load(label4);
+
+
+        ui->labelTop1->setPixmap(qpixTop1.scaled(ui->labelTop1->height(), ui->labelTop1->width(), Qt::KeepAspectRatio) );
+       // ui->labelTop1->setPixmap(qpixTop1);
+        //ui->labelTop1->resize(  qpixTop1.width(), qpixTop1.height() );
+        ui->labelTop2->setPixmap(qpixTop2.scaled(ui->labelTop2->height(), ui->labelTop2->width(), Qt::KeepAspectRatio) );
+       // ui->labelTop2->setPixmap(qpixTop2);
+        //ui->labelTop2->resize(  qpixTop2.width(), qpixTop2.height() );
+       ui->labelTop3->setPixmap(qpixTop3.scaled(ui->labelTop3->height(), ui->labelTop3->width(), Qt::KeepAspectRatio) );
+        //ui->labelTop3->setPixmap(qpixTop3);
+        //ui->labelTop3->resize(  qpixTop3.width(), qpixTop3.height() );
+       ui->labelTop4->setPixmap(qpixTop4.scaled(ui->labelTop4->height(), ui->labelTop4->width(), Qt::KeepAspectRatio) );
+       // ui->labelTop4->setPixmap(qpixTop4);
+        //ui->labelTop4->resize(  qpixTop4.width(), qpixTop4.height() );
+
 }
 
 void MainWindow::ChangeModelIndex()  {
@@ -159,12 +191,12 @@ void MainWindow::ChangeModelIndex()  {
 
 void MainWindow::SelectModel()  {
         if( model == "Origin")  {
-                net_.reset( new caffe::Net<float>("deploy.prototxt", caffe::TEST));
-                net_->CopyTrainedLayersFrom("alexnet.caffemodel");
+                net_.reset( new caffe::Net<float>("origin.prototxt", caffe::TEST));
+                net_->CopyTrainedLayersFrom("origin.caffemodel");
         }
         else if( model == "Local" )  {
-            net_.reset( new caffe::Net<float>("deploy.prototxt", caffe::TEST));
-            net_->CopyTrainedLayersFrom("alexnet.caffemodel");
+            net_.reset( new caffe::Net<float>("local.prototxt", caffe::TEST));
+            net_->CopyTrainedLayersFrom("local.caffemodel");
         }
         else if( model == "Global" )  {
             net_.reset( new caffe::Net<float>("deploy.prototxt", caffe::TEST));

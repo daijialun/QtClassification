@@ -52,6 +52,7 @@ private:
     int width_;
     int channels_;
     std::vector<std::string> labels_;
+    void ShowTopImage(std::vector<std::string> labels);
 
 public slots:
     void ShowDialog();

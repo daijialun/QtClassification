@@ -45,3 +45,6 @@ QMAKE_CXXFLAGS += -DCPU_ONLY
 
 QMAKE_CXXFLAGS += -Wall -Wno-sign-compare
 
+RESOURCES += \
+    qrc.qrc
+
