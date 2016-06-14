@@ -11,7 +11,14 @@
 #include <QDebug>
 #include <opencv2/highgui/highgui.hpp>
 #include <string>
-#include <iostream>
+#include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
+#include "caffe/caffe.hpp"
+#include <memory>
+#include <fstream>
+#include <vector>
+#include <algorithm>
+#include <utility>
 
 namespace Ui {
 class MainWindow;
@@ -24,6 +31,7 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    static bool PairCompare(const std::pair<int, float>& lhs, const std::pair<int, float>& rhs);
 
 private:
     Ui::MainWindow *ui;
@@ -32,6 +40,7 @@ private:
 public slots:
     void ShowDialog();
     void ShowImage();
+    void ChangeModelIndex();
 };
 
 #endif // MAINWINDOW_H

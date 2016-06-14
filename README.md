@@ -1,1 +1,1 @@
-# QtOpencv
+# QtClassification
