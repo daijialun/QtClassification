@@ -1,0 +1,34 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/Asterionellopsis.png</file>
+        <file>images/Bad.png</file>
+        <file>images/Chaetoceros.png</file>
+        <file>images/Chaetoceros_didymus_flagellate.png</file>
+        <file>images/Ciliate_mix.png</file>
+        <file>images/Corethron.png</file>
+        <file>images/Cylindrotheca.png</file>
+        <file>images/Detritus.png</file>
+        <file>images/Dictyocha.png</file>
+        <file>images/Dino30.png</file>
+        <file>images/Dinobryon.png</file>
+        <file>images/Ditylum.png</file>
+        <file>images/Eucampia.png</file>
+        <file>images/Flagellate_sp3.png</file>
+        <file>images/Guinardia_delicatula.png</file>
+        <file>images/Guinardia_flaccida.png</file>
+        <file>images/Guinardia_striata.png</file>
+        <file>images/Heterocapsa_triquetra.png</file>
+        <file>images/Laboea_strobila.png</file>
+        <file>images/Leptocylindrus.png</file>
+        <file>images/Pennate.png</file>
+        <file>images/Phaeocystis.png</file>
+        <file>images/Pleurosigma.png</file>
+        <file>images/Prorocentrum.png</file>
+        <file>images/Pseudonitzschia.png</file>
+        <file>images/Skeletonema.png</file>
+        <file>images/Thalassionema.png</file>
+        <file>images/Thalassiosira.png</file>
+        <file>images/Thalassiosira_dirty.png</file>
+        <file>images/Tintinnid.png</file>
+    </qresource>
+</RCC>
