@@ -20,6 +20,12 @@
 #include <algorithm>
 #include <utility>
 
+enum deepModel {
+        ORIGIN,
+        LOCAL,
+        GLOBAL,
+};
+
 namespace Ui {
 class MainWindow;
 }
@@ -31,16 +37,27 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    static bool PairCompare(const std::pair<int, float>& lhs, const std::pair<int, float>& rhs);
+
 
 private:
     Ui::MainWindow *ui;
     QDialog *dialog;
+     static bool PairCompare(const std::pair<int, float>& lhs, const std::pair<int, float>& rhs);
+    caffe::shared_ptr< caffe::Net<float> > net_;
+    cv::Mat mImage;
+    QString model;
+    caffe::Blob<float>* blobImage;
+    caffe::Blob<float>* blobPrediction;
+    int height_;
+    int width_;
+    int channels_;
+    std::vector<std::string> labels_;
 
 public slots:
     void ShowDialog();
-    void ShowImage();
+    void Prediction();
     void ChangeModelIndex();
+    void SelectModel();
 };
 
 #endif // MAINWINDOW_H

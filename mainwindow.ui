@@ -332,7 +332,7 @@ color: rgb(15, 255, 0);</string>
      <string/>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="btnSelect">
     <property name="geometry">
      <rect>
       <x>380</x>
