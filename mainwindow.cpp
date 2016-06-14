@@ -76,7 +76,15 @@ void MainWindow::Prediction()  {
         CHECK_EQ( blobImage->width(), 227) << "Network must input size: 227x227";
 
         float* blobData = blobImage->mutable_cpu_data();
-        mNormalized.convertTo(mNormalized, CV_8UC1);
+
+        for(int i=0; i<mNormalized.rows; i++)  {
+                float* fData = mNormalized.ptr<float>(i);
+                for(int j=0; j<mNormalized.cols; j++)  {
+                        *blobData = fData[j];
+                        blobData++;
+                }
+        }
+        /*mNormalized.convertTo(mNormalized, CV_8UC1);
         for(int i=0; i<height_*width_; i++)  {
                 *blobData = static_cast<float>(*mNormalized.data);
                 blobData++;
