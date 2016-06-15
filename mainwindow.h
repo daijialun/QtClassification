@@ -10,7 +10,7 @@
 #include <QImage>
 #include <QDebug>
 #include <opencv2/highgui/highgui.hpp>
-#include <string>
+#include <string>model
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include "caffe/caffe.hpp"
@@ -19,11 +19,11 @@
 #include <vector>
 #include <algorithm>
 #include <utility>
+#include <QMessageBox>
 
-enum deepModel {
-        ORIGIN,
-        LOCAL,
-        GLOBAL,
+enum modelStatus {
+        NOCHANGE,
+        CHANGED,
 };
 
 namespace Ui {
@@ -53,12 +53,14 @@ private:
     int channels_;
     std::vector<std::string> labels_;
     void ShowTopImage(std::vector<std::string> labels);
+    modelStatus status;
 
 public slots:
     void ShowDialog();
     void Prediction();
     void ChangeModelIndex();
     void SelectModel();
+    void ChangeModelStatus();
 };
 
 #endif // MAINWINDOW_H

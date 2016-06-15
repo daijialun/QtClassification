@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->btnShow, SIGNAL(clicked(bool)), this, SLOT(Prediction()) );
     connect(ui->comboBoxModel, SIGNAL(currentIndexChanged(QString)), this, SLOT(ChangeModelIndex()) );
     connect(ui->btnSelect, SIGNAL(clicked(bool)), this, SLOT(SelectModel()) );
+    connect(ui->comboBoxModel, SIGNAL(currentIndexChanged(int)), this, SLOT(ChangeModelStatus()) );
 }
 
 MainWindow::~MainWindow()
@@ -90,7 +91,7 @@ void MainWindow::Prediction()  {
                 blobData++;
                 mNormalized.data++;
         }
-        /*uchar* mData = mNormalized.data;
+        uchar* mData = mNormalized.data;
         for(int i=0; i<height_*width_; i++)  {
                 *blobData = static_cast<float>(*mData);
                 blobData++;
@@ -147,7 +148,6 @@ void MainWindow::Prediction()  {
         ui->labelScore4->setText(QString::number(vec_pairs[3].second));
 
         ShowTopImage(labels_sorted);
-
 }
 
 bool MainWindow::PairCompare(const std::pair<int, float>& lhs, const std::pair<int, float>& rhs) {
@@ -190,46 +190,61 @@ void MainWindow::ChangeModelIndex()  {
 }
 
 void MainWindow::SelectModel()  {
-        if( model == "Origin")  {
-                net_.reset( new caffe::Net<float>("origin.prototxt", caffe::TEST));
-                net_->CopyTrainedLayersFrom("origin.caffemodel");
+        if( ui->comboBoxModel->currentIndex()==-1 )  {
+                QMessageBox::StandardButton reply;
+                reply = QMessageBox::information(this, "QMessageBox::information()", "Please select one model.");
         }
-        else if( model == "Local" )  {
-            net_.reset( new caffe::Net<float>("local.prototxt", caffe::TEST));
-            net_->CopyTrainedLayersFrom("local.caffemodel");
+        else if( status==NOCHANGE )  {
+            QMessageBox::StandardButton reply;
+            reply = QMessageBox::information(this, "QMessageBox::information()", "Please choose one new model.");
         }
-        else if( model == "Global" )  {
-            net_.reset( new caffe::Net<float>("deploy.prototxt", caffe::TEST));
-            net_->CopyTrainedLayersFrom("alexnet.caffemodel");
-        }
+        else {
+                status = NOCHANGE;
+                if( model == "Origin")  {
+                        net_.reset( new caffe::Net<float>("origin.prototxt", caffe::TEST));
+                        net_->CopyTrainedLayersFrom("origin.caffemodel");
+                }
+                else if( model == "Local" )  {
+                    net_.reset( new caffe::Net<float>("local.prototxt", caffe::TEST));
+                    net_->CopyTrainedLayersFrom("local.caffemodel");
+                }
+                else if( model == "Global" )  {
+                    net_.reset( new caffe::Net<float>("deploy.prototxt", caffe::TEST));
+                    net_->CopyTrainedLayersFrom("alexnet.caffemodel");
+                }
 
-        // ******** Check Input Number and Output Number ******** //
-        CHECK_EQ(net_->num_inputs(), 1) << "Network shoud have exactly one input.";
-        CHECK_EQ(net_->num_outputs(), 1) << "Network should have exactly one output.";
+                // ******** Check Input Number and Output Number ******** //
+                CHECK_EQ(net_->num_inputs(), 1) << "Network shoud have exactly one input.";
+                CHECK_EQ(net_->num_outputs(), 1) << "Network should have exactly one output.";
 
-        caffe::Blob<float> *input_layer = net_->input_blobs()[0];
-        channels_ = input_layer->channels();
-        height_ = input_layer->height();
-        width_ = input_layer->width();
-        CHECK_EQ(channels_, 1) << "Network should only have one channel.";    // Check Model Channels
-
-
-        // ******** Load Label.txt ******** //
-        std::ifstream label_file("label.txt");
-        CHECK(label_file) << "Unable to open labels file " << label_file;
-        std::string line;
-        labels_.clear();
-        while( std::getline(label_file, line) )  {
-                    labels_.push_back(line);
-        }
-
-
-        // ******** Network Output ******** //
-        caffe::Blob<float> *output_layer = net_->output_blobs()[0];
-        CHECK_EQ( output_layer->channels(), labels_.size() ) << "Prediciton number must be equal to the class number.";     // Check labels equation
+                caffe::Blob<float> *input_layer = net_->input_blobs()[0];
+                channels_ = input_layer->channels();
+                height_ = input_layer->height();
+                width_ = input_layer->width();
+                CHECK_EQ(channels_, 1) << "Network should only have one channel.";    // Check Model Channels
 
 
-        // ******* Reshape Network for Only One Image ***** //
-        input_layer->Reshape(1, channels_, height_, width_);
-        net_->Reshape();
+                // ******** Load Label.txt ******** //
+                std::ifstream label_file("label.txt");
+                CHECK(label_file) << "Unable to open labels file " << label_file;
+                std::string line;
+                labels_.clear();
+                while( std::getline(label_file, line) )  {
+                            labels_.push_back(line);
+                }
+
+
+                // ******** Network Output ******** //
+                caffe::Blob<float> *output_layer = net_->output_blobs()[0];
+                CHECK_EQ( output_layer->channels(), labels_.size() ) << "Prediciton number must be equal to the class number.";     // Check labels equation
+
+
+                // ******* Reshape Network for Only One Image ***** //
+                input_layer->Reshape(1, channels_, height_, width_);
+                net_->Reshape();
+         }
 }
+
+ void MainWindow::ChangeModelStatus()  {
+        status = CHANGED;
+ }
